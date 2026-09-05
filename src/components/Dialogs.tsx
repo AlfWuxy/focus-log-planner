@@ -12,29 +12,55 @@ interface ModalProps {
 
 const Modal = ({ title, description, onClose, children, size = "normal" }: ModalProps) => {
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
 
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null;
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    headingRef.current?.focus();
+    const panel = panelRef.current;
+    const focusableElements = () => Array.from(panel?.querySelectorAll<HTMLElement>(
+      'button:not(:disabled), input:not(:disabled), a[href], [tabindex="0"]',
+    ) ?? []).filter((element) => !element.closest('[hidden]'));
+    (panel?.querySelector<HTMLElement>('input:not(:disabled)') ?? focusableElements()[0] ?? headingRef.current)?.focus();
 
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+    // 限制键盘焦点在弹窗内，同时保留 Escape 和关闭后的焦点位置。
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeRef.current();
+      }
+      if (event.key !== "Tab") return;
+      const elements = focusableElements();
+      const first = elements[0];
+      const last = elements.at(-1);
+      if (!first) {
+        event.preventDefault();
+        headingRef.current?.focus();
+      } else if (event.shiftKey && (document.activeElement === first || !elements.includes(document.activeElement as HTMLElement))) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !elements.includes(document.activeElement as HTMLElement))) {
+        event.preventDefault();
+        first.focus();
+      }
     };
-    document.addEventListener("keydown", closeOnEscape);
+    document.addEventListener("keydown", handleKey);
     return () => {
-      document.removeEventListener("keydown", closeOnEscape);
+      document.removeEventListener("keydown", handleKey);
       document.body.style.overflow = originalOverflow;
-      previouslyFocused?.focus();
+      if (previouslyFocused?.isConnected) previouslyFocused.focus();
     };
-  }, [onClose]);
+  }, []);
 
   return (
     <div className="modal-backdrop" onMouseDown={(event) => {
       if (event.target === event.currentTarget) onClose();
     }}>
       <section
+        ref={panelRef}
         className={`modal-panel ${size === "wide" ? "wide" : ""}`}
         role="dialog"
         aria-modal="true"
@@ -166,7 +192,6 @@ export const AddNoteDialog = ({ defaultDate, onClose, onSave }: AddNoteDialogPro
             value={note}
             onChange={(event) => setNote(event.target.value)}
             placeholder="What should future-you remember?"
-            autoFocus
             required
           />
         </label>
@@ -199,7 +224,6 @@ export const AddReasonDialog = ({ onClose, onSave }: AddReasonDialogProps) => {
             value={label}
             onChange={(event) => setLabel(event.target.value)}
             placeholder="What got in the way?"
-            autoFocus
             required
           />
         </label>
@@ -258,8 +282,7 @@ export const NotionAccessDialog = ({
               autoComplete="off"
               spellCheck={false}
               aria-describedby="local-access-key-hint"
-              autoFocus
-              required
+                required
             />
           </label>
           <p className="field-hint" id="local-access-key-hint">

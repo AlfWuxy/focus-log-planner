@@ -27,13 +27,13 @@ export const Sidebar = ({
 
   return (
     <aside className="sidebar" aria-label="Notes, blockers, and data source">
-      <section className="sidebar-section upcoming" aria-labelledby="upcoming-title">
+      <section id="upcoming" className="sidebar-section upcoming" tabIndex={-1} aria-labelledby="upcoming-title">
         <h2 id="upcoming-title">Upcoming notes</h2>
         <p>Your plan for the next couple of days.</p>
         <ul className="note-list">
           {notes.map((note) => (
             <li key={note.id}>
-              <span className="calendar-box"><CalendarIcon /></span>
+              <span className="calendar-box"><CalendarIcon size={20} /></span>
               <span>
                 <strong>{formatShortDate(note.date)}</strong>
                 <small>{note.note || describeRelativeDate(note.date, currentDate)}</small>
@@ -55,10 +55,10 @@ export const Sidebar = ({
           {blockers.map((reason) => (
             <li key={reason.id}>
               <span>{reason.label}</span>
+              <strong aria-label={`${reason.count} occurrences`}>{reason.count}</strong>
               <span className="reason-track" aria-hidden="true">
                 <span style={{ width: `${(reason.count / maxCount) * 68}%` }} />
               </span>
-              <strong aria-label={`${reason.count} occurrences`}>{reason.count}</strong>
             </li>
           ))}
         </ul>
@@ -84,6 +84,7 @@ export const Sidebar = ({
         <button
           type="button"
           className="source-choice"
+          aria-label="Connect Notion"
           aria-pressed={dataSource === "notion"}
           onClick={() => onSourceChange("notion")}
         >

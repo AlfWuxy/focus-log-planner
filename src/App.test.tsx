@@ -128,7 +128,7 @@ describe("Focus Log interactions", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "Notion" }));
-    await user.click(screen.getByRole("menuitemradio", { name: /Demo data/ }));
+    await user.click(within(screen.getByRole("group", { name: "Choose data source" })).getByRole("button", { name: /Demo data/ }));
     expect(screen.getByText("Finish the project outline")).toBeInTheDocument();
     expect(screen.queryByText("Check sources")).not.toBeInTheDocument();
   });
