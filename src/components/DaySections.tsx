@@ -34,13 +34,12 @@ export const BigThree = ({ tasks, onToggle, onMove, onEdit, readOnly = false }: 
   <section className="timeline-section big-three" aria-labelledby="big-three-title">
     <span className="timeline-node" aria-hidden="true" />
     <div className="section-heading">
-      <h2 id="big-three-title">Big 3</h2>
-      <p>Your three most important outcomes for today.</p>
+      <div><h2 id="big-three-title">Big 3</h2><p>Make room for what matters.</p></div>
+      <span className="completion-count" aria-live="polite">{tasks.filter((task) => task.completed).length} of {tasks.length}</span>
     </div>
     <ol className="task-list">
       {tasks.map((task, index) => (
         <li key={task.id}>
-          <span className="task-number" aria-hidden="true">{index + 1}</span>
           <Checkbox
             checked={task.completed}
             label={`${task.completed ? "Mark incomplete" : "Mark complete"}: ${task.text}`}
@@ -65,7 +64,7 @@ export const BigThree = ({ tasks, onToggle, onMove, onEdit, readOnly = false }: 
     </ol>
     {readOnly ? null : (
       <button type="button" className="text-button" onClick={onEdit}>
-        <PlusIcon size={18} /> Add Big 3
+        <PencilIcon size={16} /> {tasks.length < 3 ? "Add Big 3" : "Edit priorities"}
       </button>
     )}
   </section>
@@ -90,7 +89,7 @@ export const NextActionSection = ({
     <span className="timeline-node" aria-hidden="true" />
     <div className="section-heading">
       <h2 id="next-action-title">Next action</h2>
-      <p>The single next step to move forward.</p>
+
     </div>
     <div className="next-action-row">
       <Checkbox
@@ -122,46 +121,51 @@ export const FocusHours = ({ hours, goal, onChange, readOnly = false }: FocusHou
     <section className="timeline-section focus-hours" aria-labelledby="focus-hours-title">
       <span className="timeline-node" aria-hidden="true" />
       <SectionHeading id="focus-hours-title" title="Focus hours" hint="Protect time for deep work." />
-      <div className="focus-value" aria-live="polite">
-        <strong>{hours.toFixed(1)}</strong>
-        <span>/ {goal} hours</span>
-      </div>
-      <div className="focus-controls">
-        <div
-          className="progress-track"
-          role="progressbar"
-          aria-label="Focus hours completed"
-          aria-valuemin={0}
-          aria-valuemax={goal}
-          aria-valuenow={hours}
-        >
-          <span style={{ width: `${percent}%` }} />
+      <div className="focus-summary">
+        <div className="focus-value" aria-live="polite">
+          <strong>{hours.toFixed(1)}</strong>
+          <span>of {goal} hours</span>
         </div>
-        <div className="stepper">
-          <button
-            type="button"
-            className="square-button"
-            aria-label="Decrease focus hours"
-            disabled={readOnly || hours <= 0}
-            aria-disabled={readOnly || hours <= 0}
-            onClick={() => {
-              if (!readOnly) onChange(Math.max(0, hours - 0.5));
-            }}
+        <div className="focus-controls">
+          <div
+            className="progress-track"
+            role="progressbar"
+            aria-label="Focus hours completed"
+            aria-valuemin={0}
+            aria-valuemax={goal}
+            aria-valuenow={hours}
           >
-            <MinusIcon />
-          </button>
-          <button
-            type="button"
-            className="square-button"
-            aria-label="Increase focus hours"
-            disabled={readOnly || hours >= goal}
-            aria-disabled={readOnly || hours >= goal}
-            onClick={() => {
-              if (!readOnly) onChange(Math.min(goal, hours + 0.5));
-            }}
-          >
-            <PlusIcon />
-          </button>
+            <span style={{ width: `${percent}%` }} />
+          </div>
+          <label className="focus-slider"><span className="sr-only">Set focus hours</span><input type="range" min={0} max={goal} step={0.5} value={hours} disabled={readOnly} onChange={(event) => onChange(Number(event.target.value))} /><span className="range-labels"><span>0h</span><span>{goal}h</span></span></label>
+        </div>
+        <div className="focus-percentage"><strong>{Math.round(percent)}%</strong><span>of your goal</span>
+          <div className="stepper">
+            <button
+              type="button"
+              className="square-button"
+              aria-label="Decrease focus hours"
+              disabled={readOnly || hours <= 0}
+              aria-disabled={readOnly || hours <= 0}
+              onClick={() => {
+                if (!readOnly) onChange(Math.max(0, hours - 0.5));
+              }}
+            >
+              <MinusIcon />
+            </button>
+            <button
+              type="button"
+              className="square-button"
+              aria-label="Increase focus hours"
+              disabled={readOnly || hours >= goal}
+              aria-disabled={readOnly || hours >= goal}
+              onClick={() => {
+                if (!readOnly) onChange(Math.min(goal, hours + 0.5));
+              }}
+            >
+              <PlusIcon />
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -187,9 +191,9 @@ interface ThisWeekProps {
 }
 
 export const ThisWeek = ({ days, currentDate }: ThisWeekProps) => (
-  <section className="timeline-section this-week" aria-labelledby="this-week-title">
+  <section id="this-week" className="timeline-section this-week" tabIndex={-1} aria-labelledby="this-week-title">
     <span className="timeline-node muted" aria-hidden="true" />
-    <SectionHeading id="this-week-title" title="This week" hint="A quick look at your execution." />
+    <SectionHeading id="this-week-title" title="This week" hint="Find a rhythm that works for you." />
     <div className="week-scroll" tabIndex={0} aria-label="Weekly focus summary">
       <ol className="week-list">
         {days.map((day) => (

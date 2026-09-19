@@ -34,7 +34,7 @@ Focus Log is for people who want a calm daily workspace instead of a full projec
 4. Add upcoming notes and record what got in the way.
 5. Use the seven-day view to adjust the next plan.
 
-The current app saves the demo workspace in the browser and lets you reorder the Big 3 manually. An optional local, read-only Notion connection can display configured daily entries and notes.
+The current app saves the demo workspace in the browser and lets you reorder the Big 3 manually. A calm desktop sidebar and mobile bottom navigation connect the daily plan, weekly overview, and upcoming notes. System dark mode, keyboard-friendly sheets, and focus-hour slider controls are included. An optional local, read-only Notion connection can display configured daily entries and notes.
 
 ## What is next
 

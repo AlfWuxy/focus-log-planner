@@ -11,7 +11,7 @@ import {
 } from "./components/Dialogs";
 import { addDays, describeRelativeDate, formatLongDate } from "./date";
 import { createDemoState, makeId } from "./data";
-import { GearIcon, PencilIcon } from "./icons";
+import { PencilIcon } from "./icons";
 import {
   fetchNotionFocusLog,
   isLoopbackNotionOrigin,
@@ -195,17 +195,18 @@ export default function App() {
       <Header
         dataSource={state.dataSource}
         canEdit={state.dataSource === "demo"}
+        saved={saved}
         onSourceChange={changeSource}
         onEdit={() => setDialog("edit")}
         onSettings={() => setDialog("settings")}
       />
 
-      <main id="main-content" className="dashboard">
+      <main id="main-content" className="dashboard" tabIndex={-1}>
         <div className="primary-column">
           <div className="day-heading">
             <div>
-              <p>Today</p>
-              <h1>{formatLongDate(state.date)}</h1>
+              <h1>Today</h1>
+              <p>{formatLongDate(state.date)} <span className="day-mode">{state.dataSource === "demo" ? "Sample workspace" : "Read-only"}</span></p>
             </div>
             <button
               type="button"
@@ -262,9 +263,7 @@ export default function App() {
         <span className={saved ? "save-status saved" : "save-status"}>
           <span aria-hidden="true" /> {saved ? "Saved locally" : "Local save unavailable"}
         </span>
-        <button type="button" onClick={() => setDialog("settings")}>
-          <GearIcon /> Settings
-        </button>
+        <span>Plan the day. Learn from the week.</span>
       </footer>
 
       <div className="sr-only" role="status" aria-live="polite">
